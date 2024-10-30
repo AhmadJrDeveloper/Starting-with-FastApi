@@ -1,0 +1,23 @@
+POST http://localhost:8000/bands/
+Content-Type: application/json
+
+{
+    "name": "tes",
+    "genre": "RoCk",
+    "albums": [
+        {
+        "title": "testing album",
+        "release_date": "2012-01-20"
+        },
+        {
+        "title": "testing album 2",
+        "release_date": "2013-01-15"
+        }
+    ]
+}
+
+###
+
+# GET http://localhost:8000/bands/1/
+# ###
+# GET http://localhost:8000/bands/

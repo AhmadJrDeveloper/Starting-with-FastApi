@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from enum import Enum
-from schemas import Band,GenreURLChoices
+from schemas import BandBase, BandCreate, BandWithID, GenreURLChoices
 
 app = FastAPI()
 
@@ -25,8 +25,8 @@ async def about() -> str:
     return  "This is a simple FastAPI application"
 
 @app.get("/bands")
-async def bands(genre: GenreURLChoices | None = None, has_albums: bool = False) -> list[Band]:
-    band_list = [Band(**band) for band in BANDS]
+async def bands(genre: GenreURLChoices | None = None, has_albums: bool = False) -> list[BandWithID]:
+    band_list = [BandWithID(**band) for band in BANDS]
     if genre:
         # Filtering the BANDS based on the user-specified genre (case-insensitive)
         band_list = [
@@ -40,8 +40,8 @@ async def bands(genre: GenreURLChoices | None = None, has_albums: bool = False) 
     return band_list
 
 @app.get("/bands/{band_id}")
-async def band(band_id: int) -> Band:
-    band = next((Band(**b) for b in BANDS if b["id"] == band_id), None)
+async def band(band_id: int) -> BandWithID:
+    band = next((BandWithID(**b) for b in BANDS if b["id"] == band_id), None)
     if band is None:
         raise HTTPException(status_code=404, detail="Band not found")
     else:
@@ -53,3 +53,10 @@ async def bands_for_genre(genre: GenreURLChoices) -> list[dict]:
     return [
         b for b in BANDS if b['genre'].lower() == genre.value.lower()
     ]
+
+@app.post('/bands')
+async def band_create(bandData: BandCreate) -> BandWithID:
+    id = BANDS[-1]['id'] + 1
+    band = BandWithID(id=id, **bandData.model_dump()).model_dump()
+    BANDS.append(band)
+    return band
