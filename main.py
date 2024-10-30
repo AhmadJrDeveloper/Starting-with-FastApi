@@ -25,10 +25,19 @@ async def about() -> str:
     return  "This is a simple FastAPI application"
 
 @app.get("/bands")
-async def bands() -> list[Band]:
-    return [
-        Band(**band) for band in BANDS
-    ]
+async def bands(genre: GenreURLChoices | None = None, has_albums: bool = False) -> list[Band]:
+    band_list = [Band(**band) for band in BANDS]
+    if genre:
+        # Filtering the BANDS based on the user-specified genre (case-insensitive)
+        band_list = [
+            band for band in band_list if band.genre.lower() == genre.value.lower()
+        ]
+    if has_albums:
+        # Filtering the BANDS based on the presence of albums
+        band_list = [
+            band for band in band_list if band.albums
+        ]    
+    return band_list
 
 @app.get("/bands/{band_id}")
 async def band(band_id: int) -> Band:
